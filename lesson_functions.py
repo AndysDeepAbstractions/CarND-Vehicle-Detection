@@ -49,7 +49,7 @@ def color_hist(img, nbins=32):    #bins_range=(0, 256)
 def get_features(img, orient, pix_per_cell, cell_per_block, spatial_size, hist_bins,feature_vec=False):
     
     ctrans_tosearch = convert_color(img, conv='RGB2YCrCb')
-    subimg = img
+    subimg = ctrans_tosearch
 
     ch1 = ctrans_tosearch[:,:,0]
     ch2 = ctrans_tosearch[:,:,1]
@@ -70,7 +70,7 @@ def get_features(img, orient, pix_per_cell, cell_per_block, spatial_size, hist_b
 
     return X_unscaled
 
-def find_cars(img, ystart, ystop, scale, svc, X_scaler, orient, pix_per_cell, cell_per_block, spatial_size, hist_bins):
+def find_cars(img, ystart, ystop, xstart, xstop, scale, svc, X_scaler, orient, pix_per_cell, cell_per_block, spatial_size, hist_bins):
     
     draw_box_color = (0,0,0)
     draw_box_thickness = 2
@@ -78,7 +78,7 @@ def find_cars(img, ystart, ystop, scale, svc, X_scaler, orient, pix_per_cell, ce
     draw_img = np.copy(img)
     img = img.astype(np.float32)/255
     
-    img_tosearch = img[ystart:ystop,:,:]
+    img_tosearch = img[ystart:ystop,xstart:xstop,:]
     ctrans_tosearch = convert_color(img_tosearch, conv='RGB2YCrCb')
     if scale != 1:
         imshape = ctrans_tosearch.shape
@@ -156,3 +156,18 @@ def apply_threshold(heatmap, threshold):
     heatmap[heatmap <= threshold] = 0
     # Return thresholded map
     return heatmap
+
+def draw_labeled_bboxes(img, labels):
+    # Iterate through all detected cars
+    for car_number in range(1, labels[1]+1):
+        # Find pixels with each car_number label value
+        nonzero = (labels[0] == car_number).nonzero()
+        # Identify x and y values of those pixels
+        nonzeroy = np.array(nonzero[0])
+        nonzerox = np.array(nonzero[1])
+        # Define a bounding box based on min/max x and y
+        bbox = ((np.min(nonzerox), np.min(nonzeroy)), (np.max(nonzerox), np.max(nonzeroy)))
+        # Draw the box on the image
+        cv2.rectangle(img, bbox[0], bbox[1], (0,0,255), 6)
+    # Return the image
+    return img
