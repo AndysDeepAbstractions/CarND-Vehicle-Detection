@@ -46,7 +46,7 @@ def color_hist(img, nbins=32):    #bins_range=(0, 256)
     # Return the individual histograms, bin_centers and feature vector
     return hist_features
 
-def get_features(img, orient, pix_per_cell, cell_per_block, spatial_size, hist_bins,feature_vec=False):
+def get_features(img, orient, pix_per_cell, cell_per_block, spatial_size, hist_bins,feature_vec=False): # actually not a lession function but needed for training
     
     ctrans_tosearch = convert_color(img, conv='RGB2YCrCb')
     subimg = ctrans_tosearch
