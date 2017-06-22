@@ -57,84 +57,84 @@ if visualize:
     
 
 
-![png](readme_files/output_2_1.png)
+![png](output_images/output_2_1.png)
 
 
     data/vehicles\KITTI_extracted\2058.png
     
 
 
-![png](readme_files/output_2_3.png)
+![png](output_images/output_2_3.png)
 
 
     data/vehicles\KITTI_extracted\5659.png
     
 
 
-![png](readme_files/output_2_5.png)
+![png](output_images/output_2_5.png)
 
 
     data/non-vehicles\Extras\extra1.png
     
 
 
-![png](readme_files/output_2_7.png)
+![png](output_images/output_2_7.png)
 
 
     data/non-vehicles\Extras\extra5183.png
     
 
 
-![png](readme_files/output_2_9.png)
+![png](output_images/output_2_9.png)
 
 
     data/non-vehicles\GTI\image3638.png
     
 
 
-![png](readme_files/output_2_11.png)
+![png](output_images/output_2_11.png)
 
 
     test_images\test1.jpg
     
 
 
-![png](readme_files/output_2_13.png)
+![png](output_images/output_2_13.png)
 
 
     test_images\test2.jpg
     
 
 
-![png](readme_files/output_2_15.png)
+![png](output_images/output_2_15.png)
 
 
     test_images\test3.jpg
     
 
 
-![png](readme_files/output_2_17.png)
+![png](output_images/output_2_17.png)
 
 
     test_images\test4.jpg
     
 
 
-![png](readme_files/output_2_19.png)
+![png](output_images/output_2_19.png)
 
 
     test_images\test5.jpg
     
 
 
-![png](readme_files/output_2_21.png)
+![png](output_images/output_2_21.png)
 
 
     test_images\test6.jpg
     
 
 
-![png](readme_files/output_2_23.png)
+![png](output_images/output_2_23.png)
 
 
 # Histogram of Oriented Gradients (HOG)
@@ -180,7 +180,7 @@ if visualize:
     
 
 
-![png](readme_files/output_5_2.png)
+![png](output_images/output_5_2.png)
 
 
     data/vehicles\KITTI_extracted\2058.png
@@ -188,7 +188,7 @@ if visualize:
     
 
 
-![png](readme_files/output_5_4.png)
+![png](output_images/output_5_4.png)
 
 
     data/vehicles\KITTI_extracted\5659.png
@@ -196,7 +196,7 @@ if visualize:
     
 
 
-![png](readme_files/output_5_6.png)
+![png](output_images/output_5_6.png)
 
 
     data/non-vehicles\Extras\extra1.png
@@ -204,7 +204,7 @@ if visualize:
     
 
 
-![png](readme_files/output_5_8.png)
+![png](output_images/output_5_8.png)
 
 
     data/non-vehicles\Extras\extra5183.png
@@ -212,7 +212,7 @@ if visualize:
     
 
 
-![png](readme_files/output_5_10.png)
+![png](output_images/output_5_10.png)
 
 
     data/non-vehicles\GTI\image3638.png
@@ -220,7 +220,7 @@ if visualize:
     
 
 
-![png](readme_files/output_5_12.png)
+![png](output_images/output_5_12.png)
 
 
 # Stacked Features
@@ -260,7 +260,7 @@ if visualize:
     
 
 
-![png](readme_files/output_7_2.png)
+![png](output_images/output_7_2.png)
 
 
     data/vehicles\KITTI_extracted\2058.png
@@ -268,7 +268,7 @@ if visualize:
     
 
 
-![png](readme_files/output_7_4.png)
+![png](output_images/output_7_4.png)
 
 
     data/vehicles\KITTI_extracted\5659.png
@@ -276,7 +276,7 @@ if visualize:
     
 
 
-![png](readme_files/output_7_6.png)
+![png](output_images/output_7_6.png)
 
 
     data/non-vehicles\Extras\extra1.png
@@ -284,7 +284,7 @@ if visualize:
     
 
 
-![png](readme_files/output_7_8.png)
+![png](output_images/output_7_8.png)
 
 
     data/non-vehicles\Extras\extra5183.png
@@ -292,7 +292,7 @@ if visualize:
     
 
 
-![png](readme_files/output_7_10.png)
+![png](output_images/output_7_10.png)
 
 
     data/non-vehicles\GTI\image3638.png
@@ -300,7 +300,7 @@ if visualize:
     
 
 
-![png](readme_files/output_7_12.png)
+![png](output_images/output_7_12.png)
 
 
 # Normalize
@@ -427,7 +427,7 @@ if visualize:
     
 
 
-![png](readme_files/output_14_1.png)
+![png](output_images/output_14_1.png)
 
 
     data/vehicles\KITTI_extracted\831.png
@@ -435,7 +435,7 @@ if visualize:
     
 
 
-![png](readme_files/output_14_3.png)
+![png](output_images/output_14_3.png)
 
 
     data/vehicles\KITTI_extracted\92.png
@@ -443,7 +443,7 @@ if visualize:
     
 
 
-![png](readme_files/output_14_5.png)
+![png](output_images/output_14_5.png)
 
 
     data/non-vehicles\GTI\image3340.png
@@ -451,7 +451,7 @@ if visualize:
     
 
 
-![png](readme_files/output_14_7.png)
+![png](output_images/output_14_7.png)
 
 
     data/non-vehicles\GTI\image2413.png
@@ -459,7 +459,7 @@ if visualize:
     
 
 
-![png](readme_files/output_14_9.png)
+![png](output_images/output_14_9.png)
 
 
     data/non-vehicles\GTI\image2631.png
@@ -467,7 +467,7 @@ if visualize:
     
 
 
-![png](readme_files/output_14_11.png)
+![png](output_images/output_14_11.png)
 
 
     data/non-vehicles\Extras\extra978.png
@@ -475,7 +475,7 @@ if visualize:
     
 
 
-![png](readme_files/output_14_13.png)
+![png](output_images/output_14_13.png)
 
 
     data/non-vehicles\GTI\image2598.png
@@ -483,7 +483,7 @@ if visualize:
     
 
 
-![png](readme_files/output_14_15.png)
+![png](output_images/output_14_15.png)
 
 
     data/non-vehicles\Extras\extra3673.png
@@ -491,7 +491,7 @@ if visualize:
     
 
 
-![png](readme_files/output_14_17.png)
+![png](output_images/output_14_17.png)
 
 
     data/non-vehicles\GTI\image234.png
@@ -499,7 +499,7 @@ if visualize:
     
 
 
-![png](readme_files/output_14_19.png)
+![png](output_images/output_14_19.png)
 
 
 ## Train
@@ -552,7 +552,7 @@ print(round(t2-t, 5), 'Seconds to predict', n_predict,'labels with SVC')
     
 
 
-![png](readme_files/output_16_1.png)
+![png](output_images/output_16_1.png)
 
 
     data/non-vehicles\GTI\image3665.png
@@ -560,7 +560,7 @@ print(round(t2-t, 5), 'Seconds to predict', n_predict,'labels with SVC')
     
 
 
-![png](readme_files/output_16_3.png)
+![png](output_images/output_16_3.png)
 
 
     data/vehicles\GTI_Left\image0689.png
@@ -568,7 +568,7 @@ print(round(t2-t, 5), 'Seconds to predict', n_predict,'labels with SVC')
     
 
 
-![png](readme_files/output_16_5.png)
+![png](output_images/output_16_5.png)
 
 
     data/vehicles\KITTI_extracted\2616.png
@@ -576,7 +576,7 @@ print(round(t2-t, 5), 'Seconds to predict', n_predict,'labels with SVC')
     
 
 
-![png](readme_files/output_16_7.png)
+![png](output_images/output_16_7.png)
 
 
     data/vehicles\KITTI_extracted\4735.png
@@ -584,7 +584,7 @@ print(round(t2-t, 5), 'Seconds to predict', n_predict,'labels with SVC')
     
 
 
-![png](readme_files/output_16_9.png)
+![png](output_images/output_16_9.png)
 
 
     data/non-vehicles\GTI\image3188.png
@@ -592,7 +592,7 @@ print(round(t2-t, 5), 'Seconds to predict', n_predict,'labels with SVC')
     
 
 
-![png](readme_files/output_16_11.png)
+![png](output_images/output_16_11.png)
 
 
     data/vehicles\GTI_Left\image0543.png
@@ -600,7 +600,7 @@ print(round(t2-t, 5), 'Seconds to predict', n_predict,'labels with SVC')
     
 
 
-![png](readme_files/output_16_13.png)
+![png](output_images/output_16_13.png)
 
 
     data/vehicles\KITTI_extracted\1158.png
@@ -608,7 +608,7 @@ print(round(t2-t, 5), 'Seconds to predict', n_predict,'labels with SVC')
     
 
 
-![png](readme_files/output_16_15.png)
+![png](output_images/output_16_15.png)
 
 
     data/non-vehicles\GTI\image3847.png
@@ -616,7 +616,7 @@ print(round(t2-t, 5), 'Seconds to predict', n_predict,'labels with SVC')
     
 
 
-![png](readme_files/output_16_17.png)
+![png](output_images/output_16_17.png)
 
 
     data/vehicles\KITTI_extracted\4692.png
@@ -624,7 +624,7 @@ print(round(t2-t, 5), 'Seconds to predict', n_predict,'labels with SVC')
     
 
 
-![png](readme_files/output_16_19.png)
+![png](output_images/output_16_19.png)
 
 
     4.50757 Seconds to predict 10 labels with SVC
@@ -778,7 +778,7 @@ if visualize or True:
     
 
 
-![png](readme_files/output_20_2.png)
+![png](output_images/output_20_2.png)
 
 
     test_images\test2.jpg
@@ -786,7 +786,7 @@ if visualize or True:
     
 
 
-![png](readme_files/output_20_4.png)
+![png](output_images/output_20_4.png)
 
 
     test_images\test3.jpg
@@ -794,7 +794,7 @@ if visualize or True:
     
 
 
-![png](readme_files/output_20_6.png)
+![png](output_images/output_20_6.png)
 
 
     test_images\test4.jpg
@@ -802,7 +802,7 @@ if visualize or True:
     
 
 
-![png](readme_files/output_20_8.png)
+![png](output_images/output_20_8.png)
 
 
     test_images\test5.jpg
@@ -810,7 +810,7 @@ if visualize or True:
     
 
 
-![png](readme_files/output_20_10.png)
+![png](output_images/output_20_10.png)
 
 
     test_images\test6.jpg
@@ -818,7 +818,7 @@ if visualize or True:
     
 
 
-![png](readme_files/output_20_12.png)
+![png](output_images/output_20_12.png)
 
 
 Show some examples of test images to demonstrate how your pipeline is working. How did you optimize the performance of your classifier?
