@@ -134,9 +134,17 @@ def find_cars(img, ystart, ystop, xstart, xstop, scale, svc, X_scaler, orient, p
                 xbox_left = np.int(xleft*scale)
                 ytop_draw = np.int(ytop*scale)
                 win_draw = np.int(window*scale)
-                cv2.rectangle(draw_img,(xbox_left, ytop_draw+ystart),(xbox_left+win_draw,ytop_draw+win_draw+ystart),draw_box_color,draw_box_thickness) 
                 
-                bbox_list.append(((xbox_left, ytop_draw+ystart),(xbox_left+win_draw,ytop_draw+win_draw+ystart)))
+                upper_left_coords  = (xbox_left         +xstart,ytop_draw         +ystart)
+                lower_right_coords = (xbox_left+win_draw+xstart,ytop_draw+win_draw+ystart)
+                
+                cv2.rectangle(draw_img,
+                              upper_left_coords,
+                              lower_right_coords,
+                              draw_box_color,draw_box_thickness) 
+                
+                bbox_list.append((upper_left_coords,
+                                  lower_right_coords))
                 
                 
     return draw_img,bbox_list
