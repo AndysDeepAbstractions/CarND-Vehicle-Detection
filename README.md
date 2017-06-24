@@ -31,6 +31,7 @@ import glob
 
 car_image_paths    = glob.glob('data/vehicles/**/*.png')
 noncar_image_paths = glob.glob('data/non-vehicles/**/*.png')
+
 test_image_paths   = glob.glob('test_images/*.jpg')
 video_paths        = glob.glob('*video.mp4')
 
@@ -140,10 +141,14 @@ if visualize:
 # Histogram of Oriented Gradients (HOG)
 
 
-Explain how (and identify where in your code) you extracted HOG features from the training images. Explain how you settled on your final choice of HOG parameters.
-	
+In the next Cell the HOG features getting extracted like in the Lesson. 
 
-Explanation given for methods used to extract HOG features, including which color space was chosen, which HOG parameters (orientations, pixels_per_cell, cells_per_block), and why. 
+As Colorspace YCbCR was choosen. The HOG parameters are:
+orient = 9
+pix_per_cell = 8
+cell_per_block = 2
+
+These inital Parameter give a satisfying Test Accuracy of SVC & in the Video
 
 
 
@@ -225,6 +230,16 @@ if visualize:
 
 # Stacked Features
 
+For Additional Reatures also Colorspace YCbCR was choosen.
+
+The parameters are:
+spatial_size = (32, 32)
+hist_bins = 32
+
+
+These inital Parameter give a satisfying Test Accuracy of SVC & in the Video
+
+
 
 ```python
 # Parameters
@@ -260,7 +275,7 @@ if visualize:
     
 
 
-![png](output_images/output_7_2.png)
+![png](output_images/output_8_2.png)
 
 
     data/vehicles\KITTI_extracted\2058.png
@@ -268,7 +283,7 @@ if visualize:
     
 
 
-![png](output_images/output_7_4.png)
+![png](output_images/output_8_4.png)
 
 
     data/vehicles\KITTI_extracted\5659.png
@@ -276,7 +291,7 @@ if visualize:
     
 
 
-![png](output_images/output_7_6.png)
+![png](output_images/output_8_6.png)
 
 
     data/non-vehicles\Extras\extra1.png
@@ -284,7 +299,7 @@ if visualize:
     
 
 
-![png](output_images/output_7_8.png)
+![png](output_images/output_8_8.png)
 
 
     data/non-vehicles\Extras\extra5183.png
@@ -292,7 +307,7 @@ if visualize:
     
 
 
-![png](output_images/output_7_10.png)
+![png](output_images/output_8_10.png)
 
 
     data/non-vehicles\GTI\image3638.png
@@ -300,10 +315,12 @@ if visualize:
     
 
 
-![png](output_images/output_7_12.png)
+![png](output_images/output_8_12.png)
 
 
 # Normalize
+
+In the next Cell the Features get scaled to zero mean and unit variance before training the classifier.
 
 
 ```python
@@ -315,42 +332,46 @@ X_path = car_image_paths + noncar_image_paths
 y      = np.hstack((np.ones(len(car_image_paths)), np.zeros(len(noncar_image_paths))))
 
 #reduce dataset for normalize and train due comutation limits / peak working set ~4GB
-data_set_reduce_to = len(X_path)//2
-X_path = X_path[::len(X_path)//data_set_reduce_to] 
-y      = y[::len(y)//data_set_reduce_to]
+data_set_reduce_by = 2
+X_path = X_path[::data_set_reduce_by] 
+y      = y[::data_set_reduce_by]
 
 #print(len(X_path))
 #print(len(y))
 
-try:
-    with open('X_scaler.p', 'rb') as handle:
-        X_scaler = pickle.load(handle)
-except:
-    X_scalers = []
-    for i,path in enumerate(X_path):
-        #print(i,'of',len(path),end='')
-        sys.stdout.write("Progress: %d of %d | %f%%   \r" % (i+1,len(X_path),(i+1)/len(X_path)*100 ))
-        sys.stdout.flush()
-        img = load_image(path,conv=cv2.COLOR_BGR2RGB)
-        X_unscaled = get_features(img, orient, pix_per_cell, cell_per_block, spatial_size, hist_bins)
-        X_scalers.append(X_unscaled[0])
-    print('')
-    %time X_scaler = StandardScaler().fit(X_scalers)
-    #del X_scalers
-    with open('X_scaler.p', 'wb') as handle:
-        pickle.dump(X_scaler, handle, protocol=pickle.HIGHEST_PROTOCOL)
-        
+def normalize(X_path):
+    try:
+        with open('X_scaler.p', 'rb') as handle:
+            X_scaler = pickle.load(handle)
+        print('X_scaler.p loaded')
+    except:
+        X_scalers = []
+        for i,path in enumerate(X_path):
+            #print(i,'of',len(path),end='')
+            sys.stdout.write("Progress: %d of %d | %f%%   \r" % (i+1,len(X_path),(i+1)/len(X_path)*100 ))
+            sys.stdout.flush()
+            img = load_image(path,conv=cv2.COLOR_BGR2RGB)
+            X_unscaled = get_features(img, orient, pix_per_cell, cell_per_block, spatial_size, hist_bins)
+            X_scalers.append(X_unscaled[0])
+        print('')
+        X_scaler = StandardScaler().fit(X_scalers)
+        #del X_scalers
+        with open('X_scaler.p', 'wb') as handle:
+            pickle.dump(X_scaler, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    return X_scaler
+    
+%time X_scaler = normalize(X_path)
 ```
+
+    X_scaler.p loaded
+    Wall time: 31.2 ms
+    
 
 # Classify
 
-Describe how (and identify where in your code) you trained a classifier using your selected HOG features (and color features if you used them).
-	
-
-The HOG features extracted from the training data have been used to train a classifier, could be SVM, Decision Tree or other. Features should be scaled to zero mean and unit variance before training the classifier.
-
-
 ## Split
+
+A Paths-Dataset is splitted here. The Data is loaded afterwards on demand.
 
 
 ```python
@@ -374,30 +395,25 @@ def load_data(paths):
 
     print('')
     return np.array(result)[:,:]
+       
+def load_X_data(pickle_filename,X_data_paths):
+    try:
+        with open(pickle_filename, 'rb') as handle:
+            X_data = pickle.load(handle)
+    except:
+        X_data =  load_data(X_data_paths)
+        with open(pickle_filename, 'wb') as handle:
+            pickle.dump(X_data, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    return X_data
+    
+%time X_train = load_X_data('X_train.p', X_train_paths)
+assert len(X_train) == len(y_train)
 
-try:
-    with open('X_train.p', 'rb') as handle:
-        X_train = pickle.load(handle)
-    assert len(X_train) == len(y_train)
-except:
-    X_train =  load_data(X_train_paths)
-    with open('X_train.p', 'wb') as handle:
-        pickle.dump(X_train, handle, protocol=pickle.HIGHEST_PROTOCOL)
-        
-try:
-    with open('X_test.p', 'rb') as handle:
-        X_test = pickle.load(handle)
-    assert len(X_test) == len(y_test)
-except:
-    X_test  =  load_data(X_test_paths)    
-    with open('X_test.p', 'wb') as handle:
-        pickle.dump(X_test, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-#print(X_train.shape)
-#print(X_test.shape)
-#print(y_train.shape)
-#print(y_test.shape)
 ```
+
+    Wall time: 7.25 s
+    
 
 
 ```python
@@ -419,7 +435,6 @@ if visualize:
         plt.plot(X)
         plt.title('X')
         plt.show()
-
 ```
 
     data/vehicles\GTI_Right\image0255.png
@@ -427,7 +442,7 @@ if visualize:
     
 
 
-![png](output_images/output_14_1.png)
+![png](output_images/output_16_1.png)
 
 
     data/vehicles\KITTI_extracted\831.png
@@ -435,7 +450,7 @@ if visualize:
     
 
 
-![png](output_images/output_14_3.png)
+![png](output_images/output_16_3.png)
 
 
     data/vehicles\KITTI_extracted\92.png
@@ -443,7 +458,7 @@ if visualize:
     
 
 
-![png](output_images/output_14_5.png)
+![png](output_images/output_16_5.png)
 
 
     data/non-vehicles\GTI\image3340.png
@@ -451,7 +466,7 @@ if visualize:
     
 
 
-![png](output_images/output_14_7.png)
+![png](output_images/output_16_7.png)
 
 
     data/non-vehicles\GTI\image2413.png
@@ -459,7 +474,7 @@ if visualize:
     
 
 
-![png](output_images/output_14_9.png)
+![png](output_images/output_16_9.png)
 
 
     data/non-vehicles\GTI\image2631.png
@@ -467,7 +482,7 @@ if visualize:
     
 
 
-![png](output_images/output_14_11.png)
+![png](output_images/output_16_11.png)
 
 
     data/non-vehicles\Extras\extra978.png
@@ -475,7 +490,7 @@ if visualize:
     
 
 
-![png](output_images/output_14_13.png)
+![png](output_images/output_16_13.png)
 
 
     data/non-vehicles\GTI\image2598.png
@@ -483,7 +498,7 @@ if visualize:
     
 
 
-![png](output_images/output_14_15.png)
+![png](output_images/output_16_15.png)
 
 
     data/non-vehicles\Extras\extra3673.png
@@ -491,7 +506,7 @@ if visualize:
     
 
 
-![png](output_images/output_14_17.png)
+![png](output_images/output_16_17.png)
 
 
     data/non-vehicles\GTI\image234.png
@@ -499,33 +514,62 @@ if visualize:
     
 
 
-![png](output_images/output_14_19.png)
+![png](output_images/output_16_19.png)
 
 
 ## Train
+In the next Cell the Classifier gets trained like described in the Lessons. 
+
+The test data is loaded After training the svc. 
 
 
 ```python
 import time
 from sklearn.svm import LinearSVC
 
+pickle_filename = 'svc.p'
+try:
+    with open(pickle_filename, 'rb') as handle:
+        svc = pickle.load(handle)
+    assert len(X_train) == len(y_train)
+except:
+    # Use a linear SVC 
+    svc = LinearSVC()
+    # Check the training time for the SVC
+    t=time.time()
+    svc.fit(X_train, y_train)
+    t2 = time.time()
+    print(round(t2-t, 2), 'Seconds to train SVC...')
+    with open(pickle_filename, 'wb') as handle:
+        pickle.dump(svc, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-# Use a linear SVC 
-svc = LinearSVC()
-# Check the training time for the SVC
-t=time.time()
-svc.fit(X_train, y_train)
-t2 = time.time()
-print(round(t2-t, 2), 'Seconds to train SVC...')
+
 # Check the score of the SVC
 print('Train Accuracy of SVC = ', round(svc.score(X_train, y_train), 4))
+
+%time X_test = load_X_data('X_test.p', X_test_paths)
+
 print('Test  Accuracy of SVC = ', round(svc.score(X_test, y_test), 4))
 # Check the prediction time for a single sample
 t=time.time()
 n_predict = 10
 print('My SVC predicts:     ', svc.predict(X_test[0:n_predict]))
 print('For these',n_predict, 'labels: ', y_test[0:n_predict])
+t2 = time.time()
+print(round(t2-t, 5), 'Seconds to predict', n_predict,'labels with SVC')
 
+```
+
+    Train Accuracy of SVC =  1.0
+    Wall time: 685 ms
+    Test  Accuracy of SVC =  0.9913
+    My SVC predicts:      [ 0.  0.  1.  1.  1.  0.  1.  1.  0.  1.]
+    For these 10 labels:  [ 0.  0.  1.  1.  1.  0.  1.  1.  0.  1.]
+    0.0 Seconds to predict 10 labels with SVC
+    
+
+
+```python
 if visualize:
     for path in X_test_paths[0:n_predict]:
         print(path)
@@ -535,24 +579,14 @@ if visualize:
         plt.imshow(img, cmap='gray')
         plt.title('Example Test')
         plt.show()
-
-
-t2 = time.time()
-print(round(t2-t, 5), 'Seconds to predict', n_predict,'labels with SVC')
-
 ```
 
-    7.49 Seconds to train SVC...
-    Train Accuracy of SVC =  1.0
-    Test  Accuracy of SVC =  0.9913
-    My SVC predicts:      [ 0.  0.  1.  1.  1.  0.  1.  1.  0.  1.]
-    For these 10 labels:  [ 0.  0.  1.  1.  1.  0.  1.  1.  0.  1.]
     data/non-vehicles\Extras\extra5212.png
     (64, 64, 3)
     
 
 
-![png](output_images/output_16_1.png)
+![png](output_images/output_19_1.png)
 
 
     data/non-vehicles\GTI\image3665.png
@@ -560,7 +594,7 @@ print(round(t2-t, 5), 'Seconds to predict', n_predict,'labels with SVC')
     
 
 
-![png](output_images/output_16_3.png)
+![png](output_images/output_19_3.png)
 
 
     data/vehicles\GTI_Left\image0689.png
@@ -568,7 +602,7 @@ print(round(t2-t, 5), 'Seconds to predict', n_predict,'labels with SVC')
     
 
 
-![png](output_images/output_16_5.png)
+![png](output_images/output_19_5.png)
 
 
     data/vehicles\KITTI_extracted\2616.png
@@ -576,7 +610,7 @@ print(round(t2-t, 5), 'Seconds to predict', n_predict,'labels with SVC')
     
 
 
-![png](output_images/output_16_7.png)
+![png](output_images/output_19_7.png)
 
 
     data/vehicles\KITTI_extracted\4735.png
@@ -584,7 +618,7 @@ print(round(t2-t, 5), 'Seconds to predict', n_predict,'labels with SVC')
     
 
 
-![png](output_images/output_16_9.png)
+![png](output_images/output_19_9.png)
 
 
     data/non-vehicles\GTI\image3188.png
@@ -592,7 +626,7 @@ print(round(t2-t, 5), 'Seconds to predict', n_predict,'labels with SVC')
     
 
 
-![png](output_images/output_16_11.png)
+![png](output_images/output_19_11.png)
 
 
     data/vehicles\GTI_Left\image0543.png
@@ -600,7 +634,7 @@ print(round(t2-t, 5), 'Seconds to predict', n_predict,'labels with SVC')
     
 
 
-![png](output_images/output_16_13.png)
+![png](output_images/output_19_13.png)
 
 
     data/vehicles\KITTI_extracted\1158.png
@@ -608,7 +642,7 @@ print(round(t2-t, 5), 'Seconds to predict', n_predict,'labels with SVC')
     
 
 
-![png](output_images/output_16_15.png)
+![png](output_images/output_19_15.png)
 
 
     data/non-vehicles\GTI\image3847.png
@@ -616,7 +650,7 @@ print(round(t2-t, 5), 'Seconds to predict', n_predict,'labels with SVC')
     
 
 
-![png](output_images/output_16_17.png)
+![png](output_images/output_19_17.png)
 
 
     data/vehicles\KITTI_extracted\4692.png
@@ -624,29 +658,28 @@ print(round(t2-t, 5), 'Seconds to predict', n_predict,'labels with SVC')
     
 
 
-![png](output_images/output_16_19.png)
+![png](output_images/output_19_19.png)
 
-
-    4.50757 Seconds to predict 10 labels with SVC
-    
 
 # Sliding Window Search
 
-Describe how (and identify where in your code) you implemented a sliding window search. How did you decide what scales to search and how much to overlap windows?
-	
+In the next Cell a sliding window search is implemented and iterated at 3 diffrent scales
 
-A sliding window approach has been implemented, where overlapping tiles in each test image are classified as vehicle or non-vehicle. Some justification has been given for the particular implementation chosen.
+In addition to the Methods discussed in the lession Exponential Smoothing is applyed to the heatmap to improve the reliability of the classifier.
+
+The HOG subsampling method is implemented with 3 search scales. The scales are [1.0,1.6,2.4]. The Parameter are coosen intuitivly and had no futher adaption. Especially for recognizing smaller/further away cars the number of scales and the scales can be further increased in the cost of additional computing time.
 
 
 
 ```python
 from scipy.ndimage.measurements import label
 
+# ignoring left side like recommended in 2. review, and saving have of the computing time :)
 ystart = 400
 ystop = 656
-xstart = 0
+xstart = 640 
 xstop = 1280
-scale = 1.5
+scale = [1.0,1.6,2.4]
 
 class Frame_Prozessor:
     
@@ -655,9 +688,9 @@ class Frame_Prozessor:
         self.background = np.zeros(self.shape)
         self.smooth_heatmap = np.zeros(self.shape)
         # Parameters
-        self.smoothing = 0.85
+        self.smoothing = 0.93
         self.heatmap_threshold = 0
-        self.smooth_heatmap_threshold = 10
+        self.smooth_heatmap_threshold = 24
         
     def calc_heatmap(self,bbox_list,img=None,heatmap_threshold = None):
         if img == None:
@@ -700,8 +733,12 @@ class Frame_Prozessor:
         return result
     
     def visualize_frame(self,img):
-        draw_img,bbox_list = find_cars(img, ystart, ystop, xstart, xstop, scale, svc, X_scaler, orient, pix_per_cell, cell_per_block, spatial_size, hist_bins)
+        draw_img,bbox_list = find_cars(img, ystart, ystop, xstart, xstop, scale[0], svc, X_scaler, orient, pix_per_cell, cell_per_block, spatial_size, hist_bins)
         heatmap = self.calc_heatmap(bbox_list)
+        draw_img,bbox_list = find_cars(img, ystart, ystop, xstart, xstop, scale[1], svc, X_scaler, orient, pix_per_cell, cell_per_block, spatial_size, hist_bins)
+        heatmap = self.calc_heatmap(bbox_list,heatmap)
+        draw_img,bbox_list = find_cars(img, ystart, ystop, xstart, xstop, scale[2], svc, X_scaler, orient, pix_per_cell, cell_per_block, spatial_size, hist_bins)
+        heatmap = self.calc_heatmap(bbox_list,heatmap)
         result = self.add_smooth_heatmap(heatmap,draw_img)
         
         labels = label(self.smooth_heatmap_normalized_tresholded)
@@ -719,8 +756,7 @@ class Frame_Prozessor:
         #plt.imshow(result, cmap='gray')
         #plt.title('heatmap')
         #plt.show()
-        
-        
+        #
         return result,heatmap,self.smooth_heatmap_normalized_tresholded
     
     def process_frame(self,img):
@@ -728,8 +764,7 @@ class Frame_Prozessor:
         return result           
         
 frame_prozessor = Frame_Prozessor()
-
-
+    
 ```
 
 
@@ -740,13 +775,6 @@ if visualize or True:
         print(path)
         img = load_image(path,conv=cv2.COLOR_BGR2RGB)
         print(img.shape)
-
-        
-        #background = frame_prozessor.add_background(img)
-        #plt.imshow(background, cmap='gray')
-        #plt.title('background')
-        #plt.show()
-        
         
         result,heatmap,smooth_heatmap_normalized_tresholded = frame_prozessor.visualize_frame(img)
         #plt.imshow(process_frame_result, cmap='gray')
@@ -765,7 +793,7 @@ if visualize or True:
         plt.title('result')
         plt.show()
         
-        
+    
 ```
 
     test_images\test1.jpg
@@ -774,11 +802,12 @@ if visualize or True:
 
     C:\ProgramData\Anaconda3\envs\carnd-term1\lib\site-packages\skimage\feature\_hog.py:119: skimage_deprecation: Default value of `block_norm`==`L1` is deprecated and will be changed to `L2-Hys` in v0.15
       'be changed to `L2-Hys` in v0.15', skimage_deprecation)
-    C:\ProgramData\Anaconda3\envs\carnd-term1\lib\site-packages\ipykernel_launcher.py:42: FutureWarning: comparison to `None` will result in an elementwise object comparison in the future.
+    C:\ProgramData\Anaconda3\envs\carnd-term1\lib\site-packages\ipykernel_launcher.py:22: FutureWarning: comparison to `None` will result in an elementwise object comparison in the future.
+    C:\ProgramData\Anaconda3\envs\carnd-term1\lib\site-packages\ipykernel_launcher.py:43: FutureWarning: comparison to `None` will result in an elementwise object comparison in the future.
     
 
 
-![png](output_images/output_20_2.png)
+![png](output_images/output_23_2.png)
 
 
     test_images\test2.jpg
@@ -786,7 +815,7 @@ if visualize or True:
     
 
 
-![png](output_images/output_20_4.png)
+![png](output_images/output_23_4.png)
 
 
     test_images\test3.jpg
@@ -794,7 +823,7 @@ if visualize or True:
     
 
 
-![png](output_images/output_20_6.png)
+![png](output_images/output_23_6.png)
 
 
     test_images\test4.jpg
@@ -802,7 +831,7 @@ if visualize or True:
     
 
 
-![png](output_images/output_20_8.png)
+![png](output_images/output_23_8.png)
 
 
     test_images\test5.jpg
@@ -810,7 +839,7 @@ if visualize or True:
     
 
 
-![png](output_images/output_20_10.png)
+![png](output_images/output_23_10.png)
 
 
     test_images\test6.jpg
@@ -818,39 +847,27 @@ if visualize or True:
     
 
 
-![png](output_images/output_20_12.png)
+![png](output_images/output_23_12.png)
 
-
-Show some examples of test images to demonstrate how your pipeline is working. How did you optimize the performance of your classifier?
-	
-
-Some discussion is given around how you improved the reliability of the classifier i.e., fewer false positives and more reliable car detections (this could be things like choice of feature vector, thresholding the decision function, hard negative mining etc.)
 
 # Video Implementation
-
-Provide a link to your final video output. Your pipeline should perform reasonably well on the entire project video (somewhat wobbly or unstable bounding boxes are ok as long as you are identifying the vehicles most of the time with minimal false positives.)
-	
-
-The sliding-window search plus classifier has been used to search for and identify vehicles in the videos provided. Video output has been generated with detected vehicle positions drawn (bounding boxes, circles, cubes, etc.) on each frame of video.
-
-Describe how (and identify where in your code) you implemented some kind of filter for false positives and some method for combining overlapping bounding boxes.
-	
-
-A method, such as requiring that a detection be found at or near the same position in several subsequent frames, (could be a heat map showing the location of repeat detections) is implemented as a means of rejecting false positives, and this demonstrably reduces the number of false positives. Same or similar method used to draw bounding boxes (or circles, cubes, etc.) around high-confidence detections where multiple overlapping detections occur. 
 
 
 ```python
 from moviepy.editor import VideoFileClip
 
-for video_path in video_paths[-1::-1]:
-    print(video_path)
-    try:
-        frame_prozessor2 = Frame_Prozessor()  # clear previews single frame data from pipeline
-        clip = VideoFileClip(video_path).fl_image(frame_prozessor2.process_frame)
-        %time clip.write_videofile(video_path[:-4] +'_result.mp4', audio=False)
-    finally:
-        clip.reader.__del__
-        clip.__del__
+def precess_video():
+    for video_path in video_paths[-1::-1]:
+        print(video_path)
+        try:
+            frame_prozessor2 = Frame_Prozessor()  # clear previews single frame data from pipeline
+            clip = VideoFileClip(video_path).fl_image(frame_prozessor2.process_frame)
+            %time clip.write_videofile(video_path[:-4] + '_result.mp4', audio=False)
+        finally:
+            clip.reader.__del__
+            clip.__del__
+
+precess_video()
 ```
 
     test_video.mp4
@@ -858,25 +875,25 @@ for video_path in video_paths[-1::-1]:
     [MoviePy] Writing video test_video_result.mp4
     
 
-     97%|███████████████████████████████████████████████████████████████████████████████▉  | 38/39 [01:58<00:03,  3.46s/it]
+     97%|█████████████████████████████████████████▉ | 38/39 [03:31<00:05,  5.20s/it]
     
 
     [MoviePy] Done.
     [MoviePy] >>>> Video ready: test_video_result.mp4 
     
-    Wall time: 2min 1s
+    Wall time: 3min 34s
     project_video.mp4
     [MoviePy] >>>> Building video project_video_result.mp4
     [MoviePy] Writing video project_video_result.mp4
     
 
-    100%|█████████████████████████████████████████████████████████████████████████████▉| 1260/1261 [50:44<00:02,  2.36s/it]
+    100%|████████████████████████████████████▉| 1260/1261 [7:38:06<00:06,  6.90s/it]
     
 
     [MoviePy] Done.
     [MoviePy] >>>> Video ready: project_video_result.mp4 
     
-    Wall time: 50min 46s
+    Wall time: 7h 38min 15s
     
 
 # Discussion
@@ -903,9 +920,11 @@ Discussion includes some consideration of problems/issues faced, what could be i
 
 - Like always there could be some room for further parameter & model finetuning.
 
-- Manual adapting giving just a short test seqence has also the risk to build a model that fails generalizing on other data that the given.
+- Manual adapting giving just a short test seqence has also the risk to build a model that fails generalizing on other data that the given data.
 
 - A short solution for fixing the false & missing detections for given track is to add related datapoints to the (training) dataset. This was not implimented because of the earlyer mentiond concerns about such practice.
+
+- Use Regression instead of Classification to better model uncertainty
 
 '''
 ```
@@ -913,7 +932,7 @@ Discussion includes some consideration of problems/issues faced, what could be i
 
 
 
-    '\n- Heavy use of pickle was a good practise for saving time.\n\n- Due to limited memory ressources on my tablet i just used a part (every 2. Sample) of the dataset for training and normalizing. \n\n- The model should benefit from incrieasing the data size.\n  The achived Test Accuracy of SVC is 0.9913 and was satisfying for me.\n  \n- A further option to increase the performance is to argument the dataset.\n\n- Not just sum up car detection to heatmap, also subtract non car detection from heatmap can give better feedback especially in less sure situations and conrners/boarders of the image.\n\n- Like always there could be some room for further parameter & model finetuning.\n\n- Manual adapting giving just a short test seqence has also the risk to build a model that fails generalizing on other data that the given.\n\n- A short solution for fixing the false & missing detections for given track is to add related datapoints to the (training) dataset. This was not implimented because of the earlyer mentiond concerns about such practice.\n\n'
+    '\n- Heavy use of pickle was a good practise for saving time.\n\n- Due to limited memory ressources on my tablet i just used a part (every 2. Sample) of the dataset for training and normalizing. \n\n- The model should benefit from incrieasing the data size.\n  The achived Test Accuracy of SVC is 0.9913 and was satisfying for me.\n  \n- A further option to increase the performance is to argument the dataset.\n\n- Not just sum up car detection to heatmap, also subtract non car detection from heatmap can give better feedback especially in less sure situations and conrners/boarders of the image.\n\n- Like always there could be some room for further parameter & model finetuning.\n\n- Manual adapting giving just a short test seqence has also the risk to build a model that fails generalizing on other data that the given data.\n\n- A short solution for fixing the false & missing detections for given track is to add related datapoints to the (training) dataset. This was not implimented because of the earlyer mentiond concerns about such practice.\n\n- Use Regression instead of Classification to better model uncertainty\n\n'
 
 
 
